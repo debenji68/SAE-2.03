@@ -1,0 +1,45 @@
+<h1>Liste des jeux</h1>
+
+<a href="{% url 'accueil' %}">Accueil</a>
+<br><br>
+
+<a href="{% url 'ajouter_jeu' %}">
+    Ajouter un jeu
+</a>
+
+<hr>
+
+{% for jeu in jeux %}
+
+    <h2>{{ jeu.titre }}</h2>
+
+    <p>Année de sortie : {{ jeu.annee_sortie }}</p>
+    <p>Éditeur : {{ jeu.editeur }}</p>
+    <p>Auteur : {{ jeu.auteur }}</p>
+    <p>Catégorie : {{ jeu.categorie }}</p>
+
+    {% if jeu.photo_boite %}
+        <img src="{{ jeu.photo_boite.url }}" width="150">
+    {% else %}
+        <p>Aucune photo de boîte</p>
+    {% endif %}
+
+    <br><br>
+
+    <a href="{% url 'modifier_jeu' jeu.id %}">
+        Modifier
+    </a>
+
+    |
+
+    <a href="{% url 'supprimer_jeu' jeu.id %}">
+        Supprimer
+    </a>
+
+    <hr>
+
+{% empty %}
+
+    <p>Aucun jeu enregistré.</p>
+
+{% endfor %}

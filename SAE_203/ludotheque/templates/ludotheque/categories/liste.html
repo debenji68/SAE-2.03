@@ -1,0 +1,34 @@
+<h1>Liste des catégories</h1>
+
+<a href="{% url 'accueil' %}">Accueil</a>
+<br><br>
+
+<a href="{% url 'ajouter_categorie' %}">
+    Ajouter une catégorie
+</a>
+
+<hr>
+
+{% for categorie in categories %}
+
+    <h2>{{ categorie.nom }}</h2>
+
+    <p>{{ categorie.descriptif }}</p>
+
+    <a href="{% url 'modifier_categorie' categorie.id %}">
+        Modifier
+    </a>
+
+    |
+
+    <a href="{% url 'supprimer_categorie' categorie.id %}">
+        Supprimer
+    </a>
+
+    <hr>
+
+{% empty %}
+
+    <p>Aucune catégorie enregistrée.</p>
+
+{% endfor %}

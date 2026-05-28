@@ -1,0 +1,42 @@
+<h1>Liste des auteurs</h1>
+
+<a href="{% url 'accueil' %}">Accueil</a>
+<br><br>
+
+<a href="{% url 'ajouter_auteur' %}">
+    Ajouter un auteur
+</a>
+
+<hr>
+
+{% for auteur in auteurs %}
+
+    <h2>{{ auteur.prenom }} {{ auteur.nom }}</h2>
+
+    <p>Âge : {{ auteur.age }}</p>
+
+    {% if auteur.photo %}
+        <img src="{{ auteur.photo.url }}" width="150">
+    {% else %}
+        <p>Aucune photo</p>
+    {% endif %}
+
+    <br><br>
+
+    <a href="{% url 'modifier_auteur' auteur.id %}">
+        Modifier
+    </a>
+
+    |
+
+    <a href="{% url 'supprimer_auteur' auteur.id %}">
+        Supprimer
+    </a>
+
+    <hr>
+
+{% empty %}
+
+    <p>Aucun auteur enregistré.</p>
+
+{% endfor %}
