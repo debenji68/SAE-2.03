@@ -1,7 +1,8 @@
 from django.forms import ModelForm
-from django import forms  # On importe forms pour avoir accès au PasswordInput
+from django import forms
 from django.utils.translation import gettext_lazy as _
 from . import models
+from .models import Categorie, Auteur, Jeu
 
 class JoueurForm(ModelForm):
     password = forms.CharField(
@@ -27,8 +28,6 @@ class CommentaireForm(ModelForm):
             'note': _('Note globale /20'),
             'commentaire': _('Votre avis détaillé'),
         }
-from django import forms
-from .models import Categorie, Auteur, Jeu
 
 
 class CategorieForm(forms.ModelForm):
