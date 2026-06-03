@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ action }} Joueur</title>
+</head>
+<body>
+    <h1>{{ action }} un profil joueur</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Valider</button>
+    </form>
+
+    <br>
+    <a href="{% url 'joueur_liste' %}">Annuler et retourner à la liste</a>
+</body>
+</html>

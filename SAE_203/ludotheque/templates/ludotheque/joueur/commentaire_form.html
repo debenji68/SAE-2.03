@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Laisser un commentaire</title>
+</head>
+<body>
+    <h1>Donner votre avis sur le jeu : {{ jeu.titre }}</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Publier le commentaire</button>
+    </form>
+
+    <br>
+    <a href="{% url 'joueur_liste' %}">Retour</a>
+</body>
+</html>

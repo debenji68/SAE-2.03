@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ma Liste de Jeux</title>
+</head>
+<body>
+    <h1>Liste personnelle de {{ joueur.username }}</h1>
+    <a href="{% url 'joueur_liste' %}">← Retour à la liste des joueurs</a>
+    <br><br>
+
+    <ul>
+        {% for j in jeux %}
+            <li>
+                <strong>{{ j.titre }}</strong>
+                <a href="{% url 'retirer_jeu_liste' joueur.id j.id %}" style="color: red; margin-left: 10px;">[Retirer]</a>
+            </li>
+        {% empty %}
+            <li>Cette liste ne contient aucun jeu pour l'instant.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
