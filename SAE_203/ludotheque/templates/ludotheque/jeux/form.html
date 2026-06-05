@@ -1,5 +1,8 @@
 <h1>{{ titre }}</h1>
-
+{% load static %}
+<head>
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+</head>
 <a href="{% url 'liste_jeux' %}">Retour</a>
 
 <hr>
