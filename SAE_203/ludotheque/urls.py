@@ -21,4 +21,17 @@ urlpatterns = [
     path('jeux/ajouter/', views.ajouter_jeu, name='ajouter_jeu'),
     path('jeux/modifier/<int:id>/', views.modifier_jeu, name='modifier_jeu'),
     path('jeux/supprimer/<int:id>/', views.supprimer_jeu, name='supprimer_jeu'),
+
+    # Joueurs
+    path('joueurs/', views.liste_joueurs, name='liste_joueurs'),
+    path('joueurs/ajouter/', views.ajouter_joueur, name='ajouter_joueur'),
+    path('joueurs/modifier/<int:id>/', views.modifier_joueur, name='modifier_joueur'),
+    path('joueurs/supprimer/<int:id>/', views.supprimer_joueur, name='supprimer_joueur'),
+    path('joueurs/<int:id>/', views.fiche_joueur, name='fiche_joueur'),
+
+    # Commentaires
+    path('commentaires/', views.liste_commentaires, name='liste_commentaires'),
+    path('commentaires/ajouter/', views.ajouter_commentaire, name='ajouter_commentaire'),
+    path('commentaires/modifier/<int:id>/', views.modifier_commentaire, name='modifier_commentaire'),
+    path('commentaires/supprimer/<int:id>/', views.supprimer_commentaire, name='supprimer_commentaire'),
 ]

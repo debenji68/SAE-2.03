@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from . import models
-from .models import Categorie, Auteur, Jeu
+from .models import Categorie, Auteur, Jeu, Joueur, Commentaire
 
 class JoueurForm(ModelForm):
     password = forms.CharField(
@@ -10,7 +10,7 @@ class JoueurForm(ModelForm):
         label=_('Mot de passe')
     )
     class Meta:
-        model = models.Joueur
+        model = Joueur
         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'type_joueur']
         labels = {
             'username': _('Nom utilisateur'),
@@ -22,7 +22,7 @@ class JoueurForm(ModelForm):
 
 class CommentaireForm(ModelForm):
     class Meta:
-        model = models.Commentaire
+        model = Commentaire
         fields = ['note', 'commentaire']
         labels = {
             'note': _('Note globale /20'),
