@@ -66,7 +66,6 @@ def supprimer_categorie(request, id):
     })
 
 
-
 def liste_auteurs(request):
     auteurs = Auteur.objects.all()
     return render(request, 'ludotheque/auteurs/liste.html', {
