@@ -5,8 +5,20 @@ from .forms import CategorieForm, AuteurForm, JeuForm, JoueurForm, CommentaireFo
 
 
 def accueil(request):
-    return render(request, 'ludotheque/accueil.html')
+    # .order_by('?') dit à la base de données de trier aléatoirement
+    # .first() prend le tout premier élément du résultat
+    jeu_aleatoire = Jeu.objects.order_by('?').first()
+    auteur_aleatoire = Auteur.objects.order_by('?').first()
+    categorie_aleatoire = Categorie.objects.order_by('?').first()
 
+    # On envoie ces variables au template HTML
+    context = {
+        'jeu_choisi': jeu_aleatoire,
+        'auteur_choisi': auteur_aleatoire,
+        'categorie_choisie': categorie_aleatoire,
+    }
+
+    return render(request, 'ludotheque/accueil.html', context)
 
 def liste_categories(request):
     categories = Categorie.objects.all()
