@@ -1,48 +1,73 @@
-<h1>Liste des jeux</h1>
-{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+  <meta charset="UTF-8">
+  <title>Title</title>
 </head>
-<a href="{% url 'accueil' %}">Accueil</a>
-<br><br>
-
-<a href="{% url 'ajouter_jeu' %}">
-    Ajouter un jeu
-</a>
-
-<hr>
-
-{% for jeu in jeux %}
-
-    <h2>{{ jeu.titre }}</h2>
-
-    <p>Année de sortie : {{ jeu.annee_sortie }}</p>
-    <p>Éditeur : {{ jeu.editeur }}</p>
-    <p>Auteur : {{ jeu.auteur }}</p>
-    <p>Catégorie : {{ jeu.categorie }}</p>
-
-    {% if jeu.photo_boite %}
-        <img src="{{ jeu.photo_boite.url }}" width="150">
-    {% else %}
-        <p>Aucune photo de boîte</p>
-    {% endif %}
-
-    <br><br>
-
-    <a href="{% url 'modifier_jeu' jeu.id %}">
-        Modifier
-    </a>
-
-    |
-
-    <a href="{% url 'supprimer_jeu' jeu.id %}">
-        Supprimer
-    </a>
-
+<body>
+    <h1>Liste des jeux</h1>
+    <a href="{% url 'accueil' %}">Accueil</a>
+    <br>
+    <br>
+    <a href="{% url 'ajouter_jeu' %}"> Ajouter un jeu </a>
     <hr>
-
-{% empty %}
-
-    <p>Aucun jeu enregistré.</p>
-
-{% endfor %}
+    {% for jeu in jeux %}
+        <h2>{{ jeu.titre }}</h2>
+        <p>Année de sortie : {{ jeu.annee_sortie }}</p>
+        <p>Éditeur : {{ jeu.editeur }}</p>
+        <p>Auteur : {{ jeu.auteur }}</p>
+        <p>Catégorie : {{ jeu.categorie }}</p>
+        {% if jeu.photo_boite %}
+            <img src="{{ jeu.photo_boite.url }}" width="150">
+        {% else %}
+            <p>Aucune photo de boîte</p>
+        {% endif %}
+        <br>
+        <details>
+            <summary>💬 Commenter ce jeu</summary>
+            <form method="post" action="{% url 'commenter_jeu' jeu.id %}">
+                {% csrf_token %}
+                <label for="joueur_{{ jeu.id }}">Joueur :</label>
+                <select name="joueur_id" id="joueur_{{ jeu.id }}">
+                    {% for joueur in joueurs %}
+                        <option value="{{ joueur.id }}">{{ joueur.username }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <label for="note_{{ jeu.id }}">Note /20 :</label>
+                <input type="number" name="note" id="note_{{ jeu.id }}" min="0" max="20" required>
+                <br><br>
+                <label for="commentaire_{{ jeu.id }}">Avis (facultatif) :</label>
+                <br>
+                <textarea name="commentaire" id="commentaire_{{ jeu.id }}" rows="3" cols="40"></textarea>
+                <br><br>
+                <button type="submit">Envoyer</button>
+            </form>
+        </details>
+        <br>
+        <details>
+            <summary>📋 Ajouter à ma liste de jeux</summary>
+            <form method="post" action="{% url 'ajouter_jeu_liste_depuis_jeux' jeu.id %}">
+                {% csrf_token %}
+                <label for="joueur_liste_{{ jeu.id }}">Joueur :</label>
+                <select name="joueur_id" id="joueur_liste_{{ jeu.id }}">
+                    {% for joueur in joueurs %}
+                        <option value="{{ joueur.id }}">{{ joueur.username }}</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <button type="submit">Ajouter à ma liste</button>
+            </form>
+        </details>
+        <br>
+        <a href="{% url 'modifier_jeu' jeu.id %}">Modifier</a>
+        |
+        <a href="{% url 'supprimer_jeu' jeu.id %}">Supprimer</a>
+        <hr>
+    {% empty %}
+        <p>Aucun jeu enregistré.</p>
+    {% endfor %}
+</body>
+</html>

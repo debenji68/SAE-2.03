@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1>Supprimer un commentaire</h1>
+  <p>Veux-tu vraiment supprimer le commentaire de <strong>{{ commentaire.joueur.username }}</strong> sur <strong>{{ commentaire.jeu.titre }}</strong> ? </p>
+  <form method="post">
+      {% csrf_token %}
+      <button type="submit"> Oui, supprimer </button>
+  </form>
+  <br>
+  <a href="{% url 'liste_commentaires' %}"> Annuler </a>
+</body>
+</html>

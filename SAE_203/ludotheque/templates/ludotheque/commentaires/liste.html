@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1>Liste des commentaires</h1>
+  <a href="{% url 'accueil' %}">Accueil</a>
+  <hr>
+  {% for commentaire in commentaires %}
+      <h2>{{ commentaire.jeu.titre }}</h2>
+      <p>Joueur : {{ commentaire.joueur.username }}</p>
+      <p>Note : {{ commentaire.note }}/20</p>
+      <p>Date : {{ commentaire.date|date:"d/m/Y H:i" }}</p>
+      {% if commentaire.commentaire %}
+          <p>Avis : {{ commentaire.commentaire }}</p>
+      {% else %}
+          <p><em>Aucun avis rédigé.</em></p>
+      {% endif %}
+      <br>
+      <a href="{% url 'modifier_commentaire' commentaire.id %}"> Modifier </a>
+      |
+      <a href="{% url 'supprimer_commentaire' commentaire.id %}"> Supprimer </a>
+      <hr>
+  {% empty %}
+      <p>Aucun commentaire enregistré.</p>
+  {% endfor %}
+</body>
+</html>

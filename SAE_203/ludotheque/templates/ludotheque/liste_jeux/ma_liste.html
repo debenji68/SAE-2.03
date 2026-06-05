@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+  <h1>Liste de jeux de {{ joueur.username }}</h1>
+  <a href="{% url 'liste_joueurs' %}">Retour aux joueurs</a>
+  <hr>
+  <h2>Jeux dans la liste</h2>
+  {% if liste %}
+      {% for jeu in liste.jeux.all %}
+          <p><strong>{{ jeu.titre }}</strong> ({{ jeu.annee_sortie }}) — {{ jeu.editeur }} &nbsp;|&nbsp; <a href="{% url 'retirer_jeu_liste' joueur.id jeu.id %}"> Retirer de la liste </a></p>
+      {% empty %}
+          <p>La liste est vide.</p>
+      {% endfor %}
+  {% else %}
+      <p>Aucune liste créée pour ce joueur.</p>
+  {% endif %}
+  <hr>
+  <h2>Ajouter un jeu à la liste</h2>
+  {% if jeux_disponibles %}
+      <form method="post">
+          {% csrf_token %}
+          <label for="jeu_id">Choisir un jeu :</label>
+          <select name="jeu_id" id="jeu_id">
+              {% for jeu in jeux_disponibles %}
+                  <option value="{{ jeu.id }}">{{ jeu.titre }} ({{ jeu.annee_sortie }})</option>
+              {% endfor %}
+          </select>
+          <button type="submit">Ajouter</button>
+      </form>
+  {% else %}
+      <p><em>Tous les jeux sont déjà dans la liste.</em></p>
+  {% endif %}
+</body>
+</html>

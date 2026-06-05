@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Categorie, Auteur, Jeu, Joueur, Commentaire
+from .models import Categorie, Auteur, Jeu, Joueur, Commentaire, ListeJeux
 from .forms import CategorieForm, AuteurForm, JeuForm, JoueurForm, CommentaireForm
 
 
@@ -101,11 +101,13 @@ def supprimer_auteur(request, id):
     })
 
 
-
 def liste_jeux(request):
     jeux = Jeu.objects.all()
+    joueurs = Joueur.objects.all()
+
     return render(request, 'ludotheque/jeux/liste.html', {
-        'jeux': jeux
+        'jeux': jeux,
+        'joueurs': joueurs,
     })
 
 
@@ -247,3 +249,69 @@ def supprimer_commentaire(request, id):
     return render(request, 'ludotheque/commentaires/supprimer.html', {
         'commentaire': commentaire
     })
+
+
+def ma_liste_jeux(request, id):
+    joueur = get_object_or_404(Joueur, pk=id)
+
+    # Créer la liste si elle n'existe pas encore
+    liste, created = ListeJeux.objects.get_or_create(joueur=joueur)
+
+    if request.method == 'POST':
+        jeu_id = request.POST.get('jeu_id')
+        if jeu_id:
+            jeu = get_object_or_404(Jeu, pk=jeu_id)
+            liste.jeux.add(jeu)
+        return redirect('ma_liste_jeux', id=joueur.id)
+
+    # Jeux pas encore dans la liste (pour le formulaire d'ajout)
+    jeux_disponibles = Jeu.objects.exclude(id__in=liste.jeux.all())
+
+    return render(request, 'ludotheque/liste_jeux/ma_liste.html', {
+        'joueur': joueur,
+        'liste': liste,
+        'jeux_disponibles': jeux_disponibles,
+    })
+
+
+def retirer_jeu_liste(request, joueur_id, jeu_id):
+    joueur = get_object_or_404(Joueur, pk=joueur_id)
+    jeu = get_object_or_404(Jeu, pk=jeu_id)
+
+    liste = get_object_or_404(ListeJeux, joueur=joueur)
+    liste.jeux.remove(jeu)
+
+    return redirect('ma_liste_jeux', id=joueur.id)
+
+
+def commenter_jeu(request, jeu_id):
+    jeu = get_object_or_404(Jeu, pk=jeu_id)
+
+    if request.method == 'POST':
+        joueur_id = request.POST.get('joueur_id')
+        note = request.POST.get('note')
+        commentaire_texte = request.POST.get('commentaire', '')
+
+        joueur = get_object_or_404(Joueur, pk=joueur_id)
+
+        Commentaire.objects.create(
+            jeu=jeu,
+            joueur=joueur,
+            note=note,
+            commentaire=commentaire_texte,
+        )
+
+    return redirect('liste_jeux')
+
+
+def ajouter_jeu_liste_depuis_jeux(request, jeu_id):
+    jeu = get_object_or_404(Jeu, pk=jeu_id)
+
+    if request.method == 'POST':
+        joueur_id = request.POST.get('joueur_id')
+        joueur = get_object_or_404(Joueur, pk=joueur_id)
+
+        liste, created = ListeJeux.objects.get_or_create(joueur=joueur)
+        liste.jeux.add(jeu)
+
+    return redirect('liste_jeux')
