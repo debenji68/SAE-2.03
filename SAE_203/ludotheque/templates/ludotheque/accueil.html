@@ -1,5 +1,13 @@
-<h1>Bienvenue dans la ludothèque</h1>
+<html>
+{% load static %}
+<head>
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+</head>
+<body>
 
+
+
+<h1>Bienvenue dans la ludothèque</h1>
 <ul>
     <li>
         <a href="{% url 'liste_categories' %}">Gérer les catégories</a>
@@ -14,6 +22,106 @@
     </li>
 
     <li>
-        <a href="{% url 'joueur_liste' %}">Gérer les joueurs (Inscriptions, Avis, Favoris)</a>
+        <a href="{% url 'liste_joueurs' %}">Gérer les joueurs</a>
+    </li>
+
+    <li>
+        <a href="{% url 'liste_commentaires' %}">Gérer les commentaires</a>
     </li>
 </ul>
+<section class="discovery-section">
+    <div class="discovery-header">
+        <h2>🎲 Sélection Aléatoire</h2>
+        <button class="btn-refresh" onclick="window.location.reload();">💾 Reroll</button>
+    </div>
+
+    <div class="discovery-grid">
+
+        <div class="discovery-card card-game">
+            <div class="card-type-badge">Jeu du moment</div>
+            <div class="discovery-content">
+                <h3>{{ jeu_choisi.nom|default:"Aucun jeu disponible" }}</h3>
+                <p class="meta-info">Joueurs : {{ jeu_choisi.nb_joueurs|default:"Non spécifié" }}</p>
+                <p class="card-desc">{{ jeu_choisi.description|default:"Pas de description disponible." }}</p>
+            </div>
+            <div class="card-footer-action">
+                <a href="#" class="btn-card-link">Voir la fiche →</a>
+            </div>
+        </div>
+
+        <div class="discovery-card card-author">
+            <div class="card-type-badge">Auteur Vedette</div>
+            <div class="discovery-content">
+                <h3>{{ auteur_choisi.nom|default:"Aucun auteur disponible" }}</h3>
+                <p class="meta-info">Bio / Nationalité : {{ auteur_choisi.nationalite|default:"---" }}</p>
+                <p class="card-desc">{{ auteur_choisi.biographie|default:"Biographie en cours de rédaction." }}</p>
+            </div>
+            <div class="card-footer-action">
+                <a href="#" class="btn-card-link">Découvrir ses jeux →</a>
+            </div>
+        </div>
+
+        <div class="discovery-card card-category">
+            <div class="card-type-badge">Focus Catégorie</div>
+            <div class="discovery-content">
+                <h3>{{ categorie_choisie.nom|default:"Aucune catégorie" }}</h3>
+                <p class="card-desc">{{ categorie_choisie.description|default:"Explorez cette thématique." }}</p>
+            </div>
+            <div class="card-footer-action">
+                <a href="#" class="btn-card-link">Parcourir →</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+<script>
+// ===== 1. LES BANQUES DE DONNÉES POUR LE TIRAGE ALÉATOIRE =====
+const listeJeux = [
+    { titre: "Cyberpunk 2077: Le Jeu de Plateau", meta: "Par Mike Pondsmith | 1-4 Joueurs", desc: "Affrontez les corporations de Night City dans ce jeu coopératif tactique intense." },
+    { titre: "Catan", meta: "Par Klaus Teuber | 3-4 Joueurs", desc: "Le grand classique de la négociation. Collectez des ressources pour bâtir vos colonies." },
+    { titre: "Dune: Imperium", meta: "Par Paul Dennen | 1-4 Joueurs", desc: "Mélange parfait de deck-building et de placement d'ouvriers sur la planète de sable." },
+    { titre: "7 Wonders Duel", meta: "Par Antoine Bauza | 2 Joueurs", desc: "Affrontez-vous à travers les âges pour bâtir la plus grande des civilisations." },
+    { titre: "Nemesis", meta: "Par Adam Kwapiński | 1-5 Joueurs", desc: "Survivez dans un vaisseau spatial infesté d'intrus... Attention aux traîtres." }
+];
+
+const listeAuteurs = [
+    { nom: "Hideo Kojima", meta: "Spécialité : Narration & Infiltration", desc: "Connu pour repousser les frontières du jeu narratif et de l'immersion psychologique." },
+    { nom: "Bruno Cathala", meta: "Spécialité : Mécaniques Fluides & Mode 2 Joueurs", desc: "L'un des auteurs français les plus prolifiques, créateur de Kingdomino et 7 Wonders Duel." },
+    { nom: "Jamey Stegmaier", meta: "Spécialité : Gestion de ressources (Eurogames)", desc: "Le cerveau derrière Scythe et Viticulture, expert en jeux aux mécaniques interconnectées." },
+    { nom: "Antoine Bauza", meta: "Spécialité : Draft & Ambiance collective", desc: "Créateur du célébrissime 7 Wonders et d'Hanabi. Un maître du jeu de cartes moderne." }
+];
+
+const listeCategories = [
+    { nom: "Cyberpunk & SF", meta: "24 jeux en base", desc: "Des univers dystopiques, de la haute technologie et de la rébellion sur table." },
+    { nom: "Placement d'Ouvriers", meta: "45 jeux en base", desc: "Bloquez vos adversaires en posant vos pions aux meilleurs endroits pour récolter les ressources." },
+    { nom: "Bluff & Rôles Cachés", meta: "18 jeux en base", desc: "Mentez à vos amis avec le sourire pour remporter la victoire. Psychologie exigée." },
+    { nom: "Deck-Building", meta: "32 jeux en base", desc: "Commencez avec un paquet de cartes faible et améliorez-le au fil des tours pour devenir surpuissant." }
+];
+
+// ===== 2. LA FONCTION LOGIQUE DU TIRAGE ALÉATOIRE =====
+function genererSelectionAleatoire() {
+    // Sélectionner un index au hasard pour chaque catégorie
+    const jeuChoisi = listeJeux[Math.floor(Math.random() * listeJeux.length)];
+    const auteurChoisi = listeAuteurs[Math.floor(Math.random() * listeAuteurs.length)];
+    const categorieChoisie = listeCategories[Math.floor(Math.random() * listeCategories.length)];
+
+    // Injecter les données du Jeu dans le HTML
+    document.getElementById("random-game-title").innerText = jeuChoisi.titre;
+    document.getElementById("random-game-meta").innerHTML = jeuChoisi.meta;
+    document.getElementById("random-game-desc").innerText = jeuChoisi.desc;
+
+    // Injecter les données de l'Auteur dans le HTML
+    document.getElementById("random-author-title").innerText = auteurChoisi.nom;
+    document.getElementById("random-author-meta").innerText = auteurChoisi.meta;
+    document.getElementById("random-author-desc").innerText = auteurChoisi.desc;
+
+    // Injecter les données de la Catégorie dans le HTML
+    document.getElementById("random-category-title").innerText = categorieChoisie.nom;
+    document.getElementById("random-category-meta").innerText = categorieChoisie.meta;
+    document.getElementById("random-category-desc").innerText = categorieChoisie.desc;
+}
+
+// ===== 3. LANCER UN PREMIER TIRAGE AUTOMATIQUE AU CHARGEMENT DE LA PAGE =====
+document.addEventListener("DOMContentLoaded", genererSelectionAleatoire);
+</script>
+</body>

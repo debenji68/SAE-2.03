@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <h1>Fiche de {{ joueur.username }}</h1>
+  <a href="{% url 'liste_joueurs' %}">Retour à la liste</a>
+  <hr>
+  <h2>Informations personnelles</h2>
+  <p>Prénom : {{ joueur.first_name }}</p>
+  <p>Nom : {{ joueur.last_name }}</p>
+  <p>Email : {{ joueur.email }}</p>
+  <p>Type de compte : {{ joueur.get_type_joueur_display }}</p>
+  <hr>
+  <h2>Commentaires postés</h2>
+  {% for commentaire in joueur.commentaires.all %}
+      <p><strong>{{ commentaire.jeu.titre }}</strong> — Note : {{ commentaire.note }}/20 — {{ commentaire.date|date:"d/m/Y" }}</p>
+      {% if commentaire.commentaire %}
+          <p>{{ commentaire.commentaire }}</p>
+      {% endif %}
+      <hr>
+  {% empty %}
+      <p>Aucun commentaire pour ce joueur.</p>
+  {% endfor %}
+  <hr>
+  <h2>Liste de jeux</h2>
+  {% if joueur.ma_liste %}
+      {% for jeu in joueur.ma_liste.jeux.all %}
+          <p>{{ jeu.titre }} ({{ jeu.annee_sortie }}) — {{ jeu.editeur }}</p>
+      {% empty %}
+          <p>La liste est vide.</p>
+      {% endfor %}
+  {% else %}
+      <p>Aucune liste créée.</p>
+  {% endif %}
+</body>
+</html>

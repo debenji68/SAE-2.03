@@ -1,13 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Categorie, Auteur, Jeu
-from ludotheque.models import Joueur, Commentaire, ListeJeux# CORRECTION ICI : On importe TOUS les formulaires (les leurs ET les tiens)
+from .models import Categorie, Auteur, Jeu, Joueur, Commentaire, ListeJeux
 from .forms import CategorieForm, AuteurForm, JeuForm, JoueurForm, CommentaireForm
 
 
 def accueil(request):
-    return render(request, 'ludotheque/accueil.html')
+    # .order_by('?') dit à la base de données de trier aléatoirement
+    # .first() prend le tout premier élément du résultat
+    jeu_aleatoire = Jeu.objects.order_by('?').first()
+    auteur_aleatoire = Auteur.objects.order_by('?').first()
+    categorie_aleatoire = Categorie.objects.order_by('?').first()
 
+    # On envoie ces variables au template HTML
+    context = {
+        'jeu_choisi': jeu_aleatoire,
+        'auteur_choisi': auteur_aleatoire,
+        'categorie_choisie': categorie_aleatoire,
+    }
+
+    return render(request, 'ludotheque/accueil.html', context)
 
 def liste_categories(request):
     categories = Categorie.objects.all()
@@ -103,7 +114,12 @@ def supprimer_auteur(request, id):
 
 def liste_jeux(request):
     jeux = Jeu.objects.all()
-    return render(request, 'ludotheque/jeux/liste.html', {'jeux': jeux})
+    joueurs = Joueur.objects.all()
+
+    return render(request, 'ludotheque/jeux/liste.html', {
+        'jeux': jeux,
+        'joueurs': joueurs,
+    })
 
 
 def ajouter_jeu(request):
@@ -114,7 +130,10 @@ def ajouter_jeu(request):
             return redirect('liste_jeux')
     else:
         form = JeuForm()
-    return render(request, 'ludotheque/jeux/form.html', {'form': form,'titre': 'Ajouter un jeu'})
+    return render(request, 'ludotheque/jeux/form.html', {
+        'form': form,
+        'titre': 'Ajouter un jeu'
+    })
 
 
 def modifier_jeu(request, id):
@@ -126,7 +145,10 @@ def modifier_jeu(request, id):
             return redirect('liste_jeux')
     else:
         form = JeuForm(instance=jeu)
-    return render(request, 'ludotheque/jeux/form.html', {'form': form,'titre': 'Modifier un jeu'})
+    return render(request, 'ludotheque/jeux/form.html', {
+        'form': form,
+        'titre': 'Modifier un jeu'
+    })
 
 
 def supprimer_jeu(request, id):
@@ -134,91 +156,173 @@ def supprimer_jeu(request, id):
     if request.method == 'POST':
         jeu.delete()
         return redirect('liste_jeux')
-    return render(request, 'ludotheque/jeux/supprimer.html', {'jeu': jeu})
+    return render(request, 'ludotheque/jeux/supprimer.html', {
+        'jeu': jeu
+    })
 
 
-def joueur_creer(request):
-    if request.method == "POST":
+def liste_joueurs(request):
+    joueurs = Joueur.objects.all()
+    return render(request, 'ludotheque/joueurs/liste.html', {
+        'joueurs': joueurs
+    })
+
+
+def ajouter_joueur(request):
+    if request.method == 'POST':
         form = JoueurForm(request.POST)
         if form.is_valid():
-            nouveau_joueur = form.save()
-            ListeJeux.objects.create(joueur=nouveau_joueur)
-            return redirect('joueur_liste')
+            joueur = form.save(commit=False)
+            joueur.password = form.cleaned_data['password']
+            joueur.save()
+            return redirect('liste_joueurs')
     else:
         form = JoueurForm()
-    return render(request, 'ludotheque/joueur/joueur_form.html', {'form': form, 'action': 'Créer'})
+    return render(request, 'ludotheque/joueurs/form.html', {
+        'form': form,
+        'titre': 'Ajouter un joueur'
+    })
 
 
-def joueur_liste(request):
-    joueurs = Joueur.objects.all()
-    return render(request, 'ludotheque/joueur/joueur_liste.html', {'joueurs': joueurs})
-
-
-def joueur_modifier(request, pk):
-    joueur = get_object_or_404(Joueur, pk=pk)
-    if request.method == "POST":
+def modifier_joueur(request, id):
+    joueur = get_object_or_404(Joueur, pk=id)
+    if request.method == 'POST':
         form = JoueurForm(request.POST, instance=joueur)
         if form.is_valid():
             form.save()
-            return redirect('joueur_liste')
+            return redirect('liste_joueurs')
     else:
         form = JoueurForm(instance=joueur)
-    return render(request, 'ludotheque/joueur/joueur_form.html', {'form': form, 'action': 'Modifier'})
+    return render(request, 'ludotheque/joueurs/form.html', {
+        'form': form,
+        'titre': 'Modifier un joueur'
+    })
 
 
-def joueur_supprimer(request, pk):
-    joueur = get_object_or_404(Joueur, pk=pk)
-    if request.method == "POST":
+def supprimer_joueur(request, id):
+    joueur = get_object_or_404(Joueur, pk=id)
+    if request.method == 'POST':
         joueur.delete()
-        return redirect('joueur_liste')
-    return render(request, 'ludotheque/joueur/joueur_confirmer_suppression.html', {'joueur': joueur})
+        return redirect('liste_joueurs')
+    return render(request, 'ludotheque/joueurs/supprimer.html', {
+        'joueur': joueur
+    })
 
 
+def fiche_joueur(request, id):
+    joueur = get_object_or_404(Joueur, pk=id)
+    return render(request, 'ludotheque/joueurs/fiche.html', {
+        'joueur': joueur
+    })
 
-def commentaire_creer(request, jeu_id, joueur_id):
-    jeu = get_object_or_404(Jeu, id=jeu_id)
-    joueur = get_object_or_404(Joueur, id=joueur_id)
 
-    if request.method == "POST":
+def liste_commentaires(request):
+    commentaires = Commentaire.objects.select_related('joueur', 'jeu').all()
+    return render(request, 'ludotheque/commentaires/liste.html', {
+        'commentaires': commentaires
+    })
+
+
+def ajouter_commentaire(request):
+    if request.method == 'POST':
         form = CommentaireForm(request.POST)
         if form.is_valid():
-            commentaire = form.save(commit=False)
-            commentaire.jeu = jeu
-            commentaire.joueur = joueur
-            commentaire.save()
-            return redirect('detail_jeu', pk=jeu.id)
-
-    form = CommentaireForm()
-    return render(request, 'ludotheque/joueur/commentaire_form.html', {'form': form, 'jeu': jeu})
-
-
-def commentaire_supprimer(request, pk):
-    commentaire = get_object_or_404(Commentaire, pk=pk)
-    jeu_id = commentaire.jeu.id
-    commentaire.delete()
-    return redirect('detail_jeu', pk=jeu_id)
+            form.save()
+            return redirect('liste_commentaires')
+    else:
+        form = CommentaireForm()
+    return render(request, 'ludotheque/commentaires/form.html', {
+        'form': form,
+        'titre': 'Ajouter un commentaire'
+    })
 
 
-def ma_liste_jeux(request, joueur_id):
-    joueur = get_object_or_404(Joueur, id=joueur_id)
-    liste_complete = get_object_or_404(ListeJeux, joueur=joueur)
-    jeux_de_la_liste = liste_complete.jeux.all()
-    return render(request, 'ludotheque/joueur/ma_liste.html', {'joueur': joueur,'jeux': jeux_de_la_liste})
+def modifier_commentaire(request, id):
+    commentaire = get_object_or_404(Commentaire, pk=id)
+    if request.method == 'POST':
+        form = CommentaireForm(request.POST, instance=commentaire)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_commentaires')
+    else:
+        form = CommentaireForm(instance=commentaire)
+    return render(request, 'ludotheque/commentaires/form.html', {
+        'form': form,
+        'titre': 'Modifier un commentaire'
+    })
 
 
-def ajouter_jeu_liste(request, joueur_id, jeu_id):
-    joueur = get_object_or_404(Joueur, id=joueur_id)
-    jeu = get_object_or_404(Jeu, id=jeu_id)
-    liste_complete = get_object_or_404(ListeJeux, joueur=joueur)
+def supprimer_commentaire(request, id):
+    commentaire = get_object_or_404(Commentaire, pk=id)
+    if request.method == 'POST':
+        commentaire.delete()
+        return redirect('liste_commentaires')
+    return render(request, 'ludotheque/commentaires/supprimer.html', {
+        'commentaire': commentaire
+    })
 
-    liste_complete.jeux.add(jeu)
-    return redirect('ma_liste_jeux', joueur_id=joueur.id)
+
+def ma_liste_jeux(request, id):
+    joueur = get_object_or_404(Joueur, pk=id)
+
+    # Créer la liste si elle n'existe pas encore
+    liste, created = ListeJeux.objects.get_or_create(joueur=joueur)
+
+    if request.method == 'POST':
+        jeu_id = request.POST.get('jeu_id')
+        if jeu_id:
+            jeu = get_object_or_404(Jeu, pk=jeu_id)
+            liste.jeux.add(jeu)
+        return redirect('ma_liste_jeux', id=joueur.id)
+
+    # Jeux pas encore dans la liste (pour le formulaire d'ajout)
+    jeux_disponibles = Jeu.objects.exclude(id__in=liste.jeux.all())
+
+    return render(request, 'ludotheque/liste_jeux/ma_liste.html', {
+        'joueur': joueur,
+        'liste': liste,
+        'jeux_disponibles': jeux_disponibles,
+    })
 
 
 def retirer_jeu_liste(request, joueur_id, jeu_id):
-    joueur = get_object_or_404(Joueur, id=joueur_id)
-    jeu = get_object_or_404(Jeu, id=jeu_id)
-    liste_complete = get_object_or_404(ListeJeux, joueur=joueur)
+    joueur = get_object_or_404(Joueur, pk=joueur_id)
+    jeu = get_object_or_404(Jeu, pk=jeu_id)
 
-    liste_complete.jeux.remove(jeu)
-    return redirect('ma_liste_jeux', joueur_id=joueur.id)
+    liste = get_object_or_404(ListeJeux, joueur=joueur)
+    liste.jeux.remove(jeu)
+
+    return redirect('ma_liste_jeux', id=joueur.id)
+
+
+def commenter_jeu(request, jeu_id):
+    jeu = get_object_or_404(Jeu, pk=jeu_id)
+
+    if request.method == 'POST':
+        joueur_id = request.POST.get('joueur_id')
+        note = request.POST.get('note')
+        commentaire_texte = request.POST.get('commentaire', '')
+
+        joueur = get_object_or_404(Joueur, pk=joueur_id)
+
+        Commentaire.objects.create(
+            jeu=jeu,
+            joueur=joueur,
+            note=note,
+            commentaire=commentaire_texte,
+        )
+
+    return redirect('liste_jeux')
+
+
+def ajouter_jeu_liste_depuis_jeux(request, jeu_id):
+    jeu = get_object_or_404(Jeu, pk=jeu_id)
+
+    if request.method == 'POST':
+        joueur_id = request.POST.get('joueur_id')
+        joueur = get_object_or_404(Joueur, pk=joueur_id)
+
+        liste, created = ListeJeux.objects.get_or_create(joueur=joueur)
+        liste.jeux.add(jeu)
+
+    return redirect('liste_jeux')

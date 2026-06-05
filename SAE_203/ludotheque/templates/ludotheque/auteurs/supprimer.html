@@ -1,5 +1,8 @@
 <h1>Supprimer un auteur</h1>
-
+{% load static %}
+<head>
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+</head>
 <p>
     Veux-tu vraiment supprimer l’auteur :
     <strong>{{ auteur.prenom }} {{ auteur.nom }}</strong> ?
