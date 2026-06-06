@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Avg
 
 from .models import Categorie, Auteur, Jeu, Joueur, Commentaire, ListeJeux
 from .forms import CategorieForm, AuteurForm, JeuForm, JoueurForm, CommentaireForm
@@ -115,6 +116,49 @@ def supprimer_auteur(request, id):
 def liste_jeux(request):
     jeux = Jeu.objects.all()
     joueurs = Joueur.objects.all()
+
+    # ===================================================================
+    # PARTIE ALGORITHMIQUE : pour chaque jeu, on calcule
+    #   1) la moyenne des notes par type de joueur (particulier / pro)
+    #   2) le commentaire avec la note la plus haute (top)
+    #   3) le commentaire avec la note la plus basse (flop)
+    # On attache ces infos directement sur chaque objet "jeu" pour
+    # pouvoir les afficher facilement dans le template.
+    # ===================================================================
+    for jeu in jeux:
+        # --- 1) Moyenne des notes par type de joueur ---
+        # On groupe les commentaires du jeu par type de joueur, puis
+        # on calcule la moyenne SQL (Avg) pour chaque groupe.
+        moyennes = (
+            Commentaire.objects
+            .filter(jeu=jeu)
+            .values('joueur__type_joueur')        # regroupe par type
+            .annotate(moyenne=Avg('note'))         # moyenne par groupe
+        )
+        # On transforme le résultat en dictionnaire simple :
+        # { 'particulier': 14.5, 'professionnel': 17.0 }
+        dico_moyennes = {
+            ligne['joueur__type_joueur']: round(ligne['moyenne'], 2)
+            for ligne in moyennes
+        }
+        jeu.moyenne_particulier = dico_moyennes.get('particulier')
+        jeu.moyenne_professionnel = dico_moyennes.get('professionnel')
+
+        # --- 2) Commentaire avec la note la plus HAUTE (top) ---
+        jeu.meilleur_commentaire = (
+            Commentaire.objects
+            .filter(jeu=jeu)
+            .order_by('-note', '-date')            # note décroissante
+            .first()
+        )
+
+        # --- 3) Commentaire avec la note la plus BASSE (flop) ---
+        jeu.pire_commentaire = (
+            Commentaire.objects
+            .filter(jeu=jeu)
+            .order_by('note', '-date')             # note croissante
+            .first()
+        )
 
     return render(request, 'ludotheque/jeux/liste.html', {
         'jeux': jeux,

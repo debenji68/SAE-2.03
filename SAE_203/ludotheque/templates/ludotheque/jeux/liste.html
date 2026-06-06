@@ -25,6 +25,49 @@
             <p>Aucune photo de boîte</p>
         {% endif %}
         <br>
+
+        <!-- ============================================================ -->
+        <!-- PARTIE ALGORITHMIQUE : moyennes par type + top/flop          -->
+        <!-- ============================================================ -->
+
+        <!-- Moyennes des notes par type de joueur -->
+        <h3>📊 Moyennes des notes</h3>
+        <p>
+            Particuliers :
+            {% if jeu.moyenne_particulier is not None %}
+                <strong>{{ jeu.moyenne_particulier }}/20</strong>
+            {% else %}
+                Pas de note
+            {% endif %}
+        </p>
+        <p>
+            Professionnels :
+            {% if jeu.moyenne_professionnel is not None %}
+                <strong>{{ jeu.moyenne_professionnel }}/20</strong>
+            {% else %}
+                Pas de note
+            {% endif %}
+        </p>
+
+        <!-- Commentaire le mieux noté et le moins bien noté -->
+        <h3>⭐ Commentaires marquants</h3>
+        {% if jeu.meilleur_commentaire %}
+            <p style="color: green;">
+                🏆 <strong>Meilleure note ({{ jeu.meilleur_commentaire.note }}/20)</strong>
+                par {{ jeu.meilleur_commentaire.joueur.username }} :
+                « {{ jeu.meilleur_commentaire.commentaire|default:"(pas de texte)" }} »
+            </p>
+            {% if jeu.pire_commentaire.id != jeu.meilleur_commentaire.id %}
+                <p style="color: red;">
+                    💢 <strong>Pire note ({{ jeu.pire_commentaire.note }}/20)</strong>
+                    par {{ jeu.pire_commentaire.joueur.username }} :
+                    « {{ jeu.pire_commentaire.commentaire|default:"(pas de texte)" }} »
+                </p>
+            {% endif %}
+        {% else %}
+            <p>Aucun commentaire pour ce jeu.</p>
+        {% endif %}
+        <br>
         <details>
             <summary>💬 Commenter ce jeu</summary>
             <form method="post" action="{% url 'commenter_jeu' jeu.id %}">
