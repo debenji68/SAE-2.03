@@ -45,8 +45,9 @@ class Categorie(models.Model):
 class Auteur(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
-    age = models.IntegerField()
+    age = models.IntegerField() # Tu as un champ age ici !
     photo = models.ImageField(upload_to='auteurs/', blank=True, null=True)
+    biographie = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.prenom} {self.nom}"
@@ -60,6 +61,8 @@ class Jeu(models.Model):
 
     auteur = models.ForeignKey(Auteur, on_delete=models.CASCADE)
     categorie = models.ForeignKey(Categorie, on_delete=models.CASCADE)
+
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.titre

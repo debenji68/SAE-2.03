@@ -39,8 +39,11 @@ class CategorieForm(forms.ModelForm):
 class AuteurForm(forms.ModelForm):
     class Meta:
         model = Auteur
-        fields = '__all__'
-
+        # Ajoute 'photo' ici :
+        fields = ['nom', 'prenom', 'age', 'photo', 'biographie']
+        widgets = {
+            'biographie': forms.Textarea(attrs={'rows': 4}),
+        }
 
 class JeuForm(forms.ModelForm):
     class Meta:
