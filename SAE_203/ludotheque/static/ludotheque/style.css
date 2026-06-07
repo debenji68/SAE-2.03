@@ -17,6 +17,7 @@
     --game-red:   #ff0043; /* Rouge arcade dynamique */
     --game-cyan:  #00d2ff; /* Bleu néon clair */
     --game-green: #00e676; /* Vert pixel iconique */
+    --game-purple:#aa00ff; /* Violet avis joueur */
 
     --radius-sm: 4px;
     --radius-md: 8px;
@@ -45,16 +46,24 @@ h1, h2, h3 {
     letter-spacing: -0.01em;
 }
 
+/* Titre principal centré sans la barre pleine largeur */
+header {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
 h1 {
     font-family: 'Bebas Neue', sans-serif; /* Grand titre "Affiche / Borne Arcade" */
     font-size: 3.8rem;
     font-weight: 400;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 0.5em;
     padding-bottom: 0.2em;
     border-bottom: 3px solid var(--border-dark);
     display: inline-block;
+    text-align: center;
 }
 
 h2 {
@@ -91,18 +100,30 @@ a:hover {
     color: var(--game-cyan);
 }
 
-/* ===== LISTES (Menu principal - image_9906e3.png) ===== */
-ul {
+/* ===== LISTES & MENU DE GESTION (CENTRÉ ET NETTOYÉ) ===== */
+.main-nav {
+    display: flex;
+    justify-content: center; /* Centre le menu horizontalement */
+    margin: 1rem auto 3rem auto;
+    width: 100%;
+    max-width: 500px; /* Aligne proprement la boîte sur une largeur définie */
+    border: none;
+    background: none;
+    box-shadow: none;
+}
+
+.main-nav ul {
     list-style: none;
     padding: 0;
     background: var(--surface);
-    border: 2px solid var(--border-dark);
+    border: 2px solid var(--border-dark); /* Unique boîte encadrant le menu */
     box-shadow: var(--game-shadow);
     border-radius: var(--radius-md);
     overflow: hidden;
+    width: 100%;
 }
 
-li {
+.main-nav li {
     color: var(--text);
     font-weight: 600;
     padding: 1.1rem 1.4rem;
@@ -113,17 +134,17 @@ li {
     transition: all 0.15s ease;
 }
 
-li:last-child {
+.main-nav li:last-child {
     border-bottom: none;
 }
 
-li:hover {
+.main-nav li:hover {
     background: var(--surface2);
     padding-left: 1.8rem;
 }
 
 /* Le carré vert pixel */
-li::before {
+.main-nav li::before {
     content: '';
     width: 10px;
     height: 10px;
@@ -133,7 +154,7 @@ li::before {
     transition: transform 0.2s ease, background 0.2s;
 }
 
-li:hover::before {
+.main-nav li:hover::before {
     transform: rotate(45deg);
     background: var(--game-red);
 }
@@ -328,9 +349,11 @@ button.danger:hover {
     box-shadow: 3px 3px 0px var(--border-dark);
 }
 
+/* GRILLE STRICTEMENT BLOQUÉE EN CARRÉ 2X2 */
 .discovery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes égales fixes */
+    grid-template-rows: repeat(2, auto);    /* 2 lignes automatiques */
     gap: 2rem;
 }
 
@@ -352,9 +375,11 @@ button.danger:hover {
     box-shadow: 8px 8px 0px var(--border-dark);
 }
 
+/* Bordures supérieures colorées de tes 4 cartes */
 .discovery-card.card-game { border-top: 6px solid var(--game-red); }
 .discovery-card.card-author { border-top: 6px solid var(--game-green); }
 .discovery-card.card-category { border-top: 6px solid var(--game-cyan); }
+.discovery-card.card-comment { border-top: 6px solid var(--game-purple); }
 
 .card-type-badge {
     font-family: 'Pixelify Sans', monospace;
@@ -462,45 +487,16 @@ form button {
 }
 
 form button:hover {
-    background: var(--game-cyan);
-    color: var(--border-dark);
+    background: var(--game-red) !important;
+    color: white !important;
 }
 
-/* ===== LAYOUT & NAV ===== */
+/* ===== LAYOUT ===== */
 .container {
     max-width: 1120px;
     margin: 0 auto;
     padding: 3rem 2rem;
 }
-
-nav {
-    background: var(--surface);
-    border: 2px solid var(--border-dark);
-    border-radius: var(--radius-md);
-    margin: 1.5rem 2rem 0 2rem;
-    padding: 1.1rem 2rem;
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    box-shadow: var(--game-shadow);
-}
-
-nav .brand {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.2rem;
-    letter-spacing: 1px;
-    color: var(--game-red);
-}
-
-nav a {
-    font-family: 'Pixelify Sans', monospace;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-
-nav a:hover { color: var(--border-dark); }
 
 /* ===== CARDS FONCTIONNELLES GÉNÉRIQUES ===== */
 .card {
