@@ -1,0 +1,61 @@
+<h1>Importer des jeux depuis un fichier CSV</h1>
+{% load static %}
+<head>
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+</head>
+
+<a href="{% url 'liste_jeux' %}">Retour à la liste des jeux</a>
+
+<hr>
+
+<!--PRÉAMBULE : description du format de fichier attendu-->
+<h2>Format du fichier attendu</h2>
+<p>
+    Le fichier doit être au format <strong>.csv</strong> (encodé en UTF-8) et
+    contenir une <strong>ligne d'en-tête</strong> avec exactement les colonnes
+    suivantes :
+</p>
+<ul>
+    <li><strong>titre</strong> : le titre du jeu</li>
+    <li><strong>annee_sortie</strong> : l'année de sortie (nombre entier)</li>
+    <li><strong>editeur</strong> : le nom de l'éditeur</li>
+    <li><strong>auteur_nom</strong> : le nom de l'auteur</li>
+    <li><strong>auteur_prenom</strong> : le prénom de l'auteur</li>
+    <li><strong>categorie</strong> : le nom de la catégorie</li>
+</ul>
+<p>
+    Si l'auteur indiqué n'existe pas encore dans la base, il sera
+    <strong>créé automatiquement</strong> à partir de son nom et de son prénom.
+    Il en va de même pour la catégorie.
+</p>
+<p>Exemple de contenu :</p>
+<pre style="background:#eee; padding:10px; border:1px solid #ccc;">titre,annee_sortie,editeur,auteur_nom,auteur_prenom,categorie
+Catan,1995,Kosmos,Teuber,Klaus,Strategie
+Dixit,2008,Libellud,Roubira,Jean-Louis,Famille
+7 Wonders,2010,Repos Production,Bauza,Antoine,Strategie</pre>
+
+<hr>
+
+<!--FORMULAIRE D'UPLOAD-->
+<h2>Charger un fichier</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="fichier_csv" accept=".csv" required>
+    <button type="submit">Importer</button>
+</form>
+
+<!-- BILAN DE L'IMPORT-->
+{% if resultat %}
+    <hr>
+    <p style="color: green;"><strong>{{ resultat }}</strong></p>
+{% endif %}
+
+{% if erreurs %}
+    <hr>
+    <p style="color: red;"><strong>Erreurs rencontrées :</strong></p>
+    <ul>
+        {% for erreur in erreurs %}
+            <li style="color: red;">{{ erreur }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
