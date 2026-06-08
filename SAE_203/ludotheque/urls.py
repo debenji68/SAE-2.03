@@ -21,6 +21,7 @@ urlpatterns = [
     path('jeux/ajouter/', views.ajouter_jeu, name='ajouter_jeu'),
     path('jeux/modifier/<int:id>/', views.modifier_jeu, name='modifier_jeu'),
     path('jeux/supprimer/<int:id>/', views.supprimer_jeu, name='supprimer_jeu'),
+    path('jeux/importer-csv/', views.importer_jeux_csv, name='importer_jeux_csv'),
     path('jeux/<int:jeu_id>/commenter/', views.commenter_jeu, name='commenter_jeu'),
     path('jeux/<int:jeu_id>/ajouter-liste/', views.ajouter_jeu_liste_depuis_jeux, name='ajouter_jeu_liste_depuis_jeux'),
 

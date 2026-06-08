@@ -117,18 +117,12 @@ def liste_jeux(request):
     jeux = Jeu.objects.all()
     joueurs = Joueur.objects.all()
 
-    # ===================================================================
-    # PARTIE ALGORITHMIQUE : pour chaque jeu, on calcule
-    #   1) la moyenne des notes par type de joueur (particulier / pro)
-    #   2) le commentaire avec la note la plus haute (top)
-    #   3) le commentaire avec la note la plus basse (flop)
-    # On attache ces infos directement sur chaque objet "jeu" pour
-    # pouvoir les afficher facilement dans le template.
-    # ===================================================================
+# PARTIE ALGORITHMIQUE AMAURY :
+
     for jeu in jeux:
-        # --- 1) Moyenne des notes par type de joueur ---
-        # On groupe les commentaires du jeu par type de joueur, puis
-        # on calcule la moyenne SQL (Avg) pour chaque groupe.
+        #1) Moyenne des notes par type de joueur
+        # On groupe les commentaires du jeu par type de joueur,
+        # puis on calcule la moyenne SQL (Avg) pour chaque groupe.
         moyennes = (
             Commentaire.objects
             .filter(jeu=jeu)
@@ -136,7 +130,6 @@ def liste_jeux(request):
             .annotate(moyenne=Avg('note'))         # moyenne par groupe
         )
         # On transforme le résultat en dictionnaire simple :
-        # { 'particulier': 14.5, 'professionnel': 17.0 }
         dico_moyennes = {
             ligne['joueur__type_joueur']: round(ligne['moyenne'], 2)
             for ligne in moyennes
@@ -144,15 +137,15 @@ def liste_jeux(request):
         jeu.moyenne_particulier = dico_moyennes.get('particulier')
         jeu.moyenne_professionnel = dico_moyennes.get('professionnel')
 
-        # --- 2) Commentaire avec la note la plus HAUTE (top) ---
+        #2) Commentaire avec la note la plus HAUTE (top)
         jeu.meilleur_commentaire = (
             Commentaire.objects
             .filter(jeu=jeu)
-            .order_by('-note', '-date')            # note décroissante
+            .order_by('-note', '-date')         # note décroissante
             .first()
         )
 
-        # --- 3) Commentaire avec la note la plus BASSE (flop) ---
+        #3) Commentaire avec la note la plus BASSE (flop)
         jeu.pire_commentaire = (
             Commentaire.objects
             .filter(jeu=jeu)
@@ -370,3 +363,111 @@ def ajouter_jeu_liste_depuis_jeux(request, jeu_id):
         liste.jeux.add(jeu)
 
     return redirect('liste_jeux')
+
+
+
+# IMPORT DE JEUX VIA UN FICHIER CSV AMAURY
+# Permet d'insérer plusieurs jeux d'un coup à partir d'un fichier CSV.
+# Si l'auteur indiqué n'existe pas encore, il est créé automatiquement
+# à partir de son nom et son prénom.
+# Le format attendu est décrit en préambule de la page de chargement.
+import csv
+import io
+
+
+def importer_jeux_csv(request):
+    # Variables qui serviront à afficher le bilan de l'import dans la page
+    resultat = None
+    erreurs = []
+    nb_jeux = 0
+    nb_auteurs = 0
+
+    if request.method == 'POST' and request.FILES.get('fichier_csv'):
+        fichier = request.FILES['fichier_csv']
+
+        # Vérification basique de l'extension
+        if not fichier.name.endswith('.csv'):
+            erreurs.append("Le fichier doit avoir l'extension .csv")
+        else:
+            # Décodage du fichier en texte (utf-8-sig gère le BOM d'Excel)
+            try:
+                donnees = fichier.read().decode('utf-8-sig')
+            except UnicodeDecodeError:
+                donnees = None
+                erreurs.append("Le fichier doit être encodé en UTF-8.")
+
+            if donnees is not None:
+                # DictReader lit chaque ligne sous forme de dictionnaire
+                # en se basant sur la ligne d'en-tête du CSV.
+                lecteur = csv.DictReader(io.StringIO(donnees))
+
+                # Colonnes obligatoires dans le fichier
+                colonnes_attendues = {
+                    'titre', 'annee_sortie', 'editeur',
+                    'auteur_nom', 'auteur_prenom', 'categorie'
+                }
+                colonnes_fichier = set(lecteur.fieldnames or [])
+
+                if not colonnes_attendues.issubset(colonnes_fichier):
+                    manquantes = colonnes_attendues - colonnes_fichier
+                    erreurs.append(
+                        "Colonnes manquantes dans le fichier : "
+                        + ", ".join(manquantes)
+                    )
+                else:
+                    # On parcourt chaque ligne (numéro 2 = 1re ligne de données,
+                    # car la ligne 1 est l'en-tête)
+                    for numero, ligne in enumerate(lecteur, start=2):
+                        try:
+                            titre = ligne['titre'].strip()
+                            annee = int(ligne['annee_sortie'].strip())
+                            editeur = ligne['editeur'].strip()
+                            auteur_nom = ligne['auteur_nom'].strip()
+                            auteur_prenom = ligne['auteur_prenom'].strip()
+                            categorie_nom = ligne['categorie'].strip()
+
+                            # On refuse les lignes avec un champ vide
+                            if not all([titre, editeur, auteur_nom,
+                                        auteur_prenom, categorie_nom]):
+                                raise ValueError("un champ obligatoire est vide")
+
+                            #Création automatique de l'auteur si besoin
+                            # get_or_create : récupère l'auteur s'il existe déjà
+                            # (même nom + prénom), sinon le crée. L'âge est mis
+                            # à 0 par défaut car non fourni dans le fichier.
+                            auteur, auteur_cree = Auteur.objects.get_or_create(
+                                nom=auteur_nom,
+                                prenom=auteur_prenom,
+                                defaults={'age': 0},
+                            )
+                            if auteur_cree:
+                                nb_auteurs += 1
+
+                            #Récupère ou crée la catégorie
+                            categorie, _ = Categorie.objects.get_or_create(
+                                nom=categorie_nom,
+                                defaults={'descriptif': ''},
+                            )
+
+                            #Création du jeu
+                            Jeu.objects.create(
+                                titre=titre,
+                                annee_sortie=annee,
+                                editeur=editeur,
+                                auteur=auteur,
+                                categorie=categorie,
+                            )
+                            nb_jeux += 1
+
+                        except ValueError as e:
+                            erreurs.append(f"Ligne {numero} ignorée : {e}")
+
+                    resultat = (
+                        f"{nb_jeux} jeu(x) importé(s), "
+                        f"{nb_auteurs} auteur(s) créé(s) automatiquement."
+                    )
+
+    return render(request, 'ludotheque/jeux/importer_csv.html', {
+        'resultat': resultat,
+        'erreurs': erreurs,
+    })

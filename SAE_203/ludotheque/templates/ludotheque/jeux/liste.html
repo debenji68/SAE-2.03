@@ -12,6 +12,7 @@
     <br>
     <br>
     <a href="{% url 'ajouter_jeu' %}"> Ajouter un jeu </a>
+    <a href="{% url 'importer_jeux_csv' %}"> Importer des jeux (CSV) </a>
     <hr>
     {% for jeu in jeux %}
         <h2>{{ jeu.titre }}</h2>
@@ -26,11 +27,9 @@
         {% endif %}
         <br>
 
-        <!-- ============================================================ -->
-        <!-- PARTIE ALGORITHMIQUE : moyennes par type + top/flop          -->
-        <!-- ============================================================ -->
+        <!--PARTIE ALGORITHMIQUE AMAURY : moyennes par type + top/flop-->
 
-        <!-- Moyennes des notes par type de joueur -->
+        <!--Moyennes des notes par type de joueur-->
         <h3>📊 Moyennes des notes</h3>
         <p>
             Particuliers :
@@ -49,7 +48,7 @@
             {% endif %}
         </p>
 
-        <!-- Commentaire le mieux noté et le moins bien noté -->
+        <!--Commentaire le mieux noté et le moins bien noté-->
         <h3>⭐ Commentaires marquants</h3>
         {% if jeu.meilleur_commentaire %}
             <p style="color: green;">
