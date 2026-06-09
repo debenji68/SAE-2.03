@@ -11,15 +11,62 @@ def accueil(request):
     jeu_aleatoire = Jeu.objects.order_by('?').first()
     auteur_aleatoire = Auteur.objects.order_by('?').first()
     categorie_aleatoire = Categorie.objects.order_by('?').first()
+    commentaire_aleatoire = Commentaire.objects.order_by('?').first()
 
     # On envoie ces variables au template HTML
     context = {
         'jeu_choisi': jeu_aleatoire,
         'auteur_choisi': auteur_aleatoire,
         'categorie_choisie': categorie_aleatoire,
+        'commentaire_choisi': commentaire_aleatoire,
     }
 
     return render(request, 'ludotheque/accueil.html', context)
+
+
+# ============================================================
+# PAGES DE DÉTAIL ACCESSIBLES DEPUIS LA SÉLECTION ALÉATOIRE
+# ============================================================
+
+def jeux_par_auteur(request, id):
+    # Tous les jeux écrits par un auteur donné
+    auteur = get_object_or_404(Auteur, pk=id)
+    jeux = Jeu.objects.filter(auteur=auteur)
+    return render(request, 'ludotheque/jeux/par_auteur.html', {
+        'auteur': auteur,
+        'jeux': jeux,
+    })
+
+
+def jeux_par_categorie(request, id):
+    # Tous les jeux d'une catégorie donnée
+    categorie = get_object_or_404(Categorie, pk=id)
+    jeux = Jeu.objects.filter(categorie=categorie)
+    return render(request, 'ludotheque/jeux/par_categorie.html', {
+        'categorie': categorie,
+        'jeux': jeux,
+    })
+
+
+def fiche_jeu(request, id):
+    # Fiche détaillée d'un jeu + ses commentaires
+    jeu = get_object_or_404(Jeu, pk=id)
+    commentaires = jeu.commentaires.select_related('joueur').all()
+    return render(request, 'ludotheque/jeux/fiche.html', {
+        'jeu': jeu,
+        'commentaires': commentaires,
+    })
+
+
+def commentaires_joueur(request, id):
+    # Tous les commentaires écrits par un joueur donné
+    joueur = get_object_or_404(Joueur, pk=id)
+    commentaires = Commentaire.objects.filter(joueur=joueur).select_related('jeu')
+    return render(request, 'ludotheque/commentaires/par_joueur.html', {
+        'joueur': joueur,
+        'commentaires': commentaires,
+    })
+
 
 def liste_categories(request):
     categories = Categorie.objects.all()

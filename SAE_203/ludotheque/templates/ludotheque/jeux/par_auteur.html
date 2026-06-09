@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+    <meta charset="UTF-8">
+    <title>Jeux de {{ auteur }}</title>
+</head>
+<body>
+    <h1>Jeux de {{ auteur.prenom }} {{ auteur.nom }}</h1>
+    <a href="{% url 'accueil' %}">Accueil</a>
+    <hr>
+
+    {% if auteur.photo %}
+        <img src="{{ auteur.photo.url }}" width="150">
+    {% endif %}
+    {% if auteur.biographie %}
+        <p>{{ auteur.biographie }}</p>
+    {% endif %}
+    <hr>
+
+    {% for jeu in jeux %}
+        <h2>{{ jeu.titre }}</h2>
+        <p>Année de sortie : {{ jeu.annee_sortie }}</p>
+        <p>Éditeur : {{ jeu.editeur }}</p>
+        <p>Catégorie : {{ jeu.categorie }}</p>
+        {% if jeu.photo_boite %}
+            <img src="{{ jeu.photo_boite.url }}" width="150">
+        {% endif %}
+        <br>
+        <a href="{% url 'fiche_jeu' jeu.id %}">Voir la fiche</a>
+        <hr>
+    {% empty %}
+        <p>Aucun jeu enregistré pour cet auteur.</p>
+    {% endfor %}
+</body>
+</html>

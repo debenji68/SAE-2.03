@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+    <meta charset="UTF-8">
+    <title>{{ jeu.titre }}</title>
+</head>
+<body>
+    <h1>{{ jeu.titre }}</h1>
+    <a href="{% url 'accueil' %}">Accueil</a>
+    <hr>
+
+    {% if jeu.photo_boite %}
+        <img src="{{ jeu.photo_boite.url }}" width="200">
+    {% else %}
+        <p>Aucune photo de boîte</p>
+    {% endif %}
+
+    <p>Année de sortie : {{ jeu.annee_sortie }}</p>
+    <p>Éditeur : {{ jeu.editeur }}</p>
+    <p>Auteur :
+        <a href="{% url 'jeux_par_auteur' jeu.auteur.id %}">{{ jeu.auteur }}</a>
+    </p>
+    <p>Catégorie :
+        <a href="{% url 'jeux_par_categorie' jeu.categorie.id %}">{{ jeu.categorie.nom }}</a>
+    </p>
+
+    {% if jeu.description %}
+        <h3>Description</h3>
+        <p>{{ jeu.description }}</p>
+    {% else %}
+        <p><em>Aucune description disponible.</em></p>
+    {% endif %}
+
+    <hr>
+    <h3>Commentaires</h3>
+    {% for commentaire in commentaires %}
+        <p>
+            <strong>{{ commentaire.joueur.username }}</strong>
+            — {{ commentaire.note }}/20
+            ({{ commentaire.date|date:"d/m/Y H:i" }})
+        </p>
+        {% if commentaire.commentaire %}
+            <p>{{ commentaire.commentaire }}</p>
+        {% else %}
+            <p><em>Aucun avis rédigé.</em></p>
+        {% endif %}
+        <hr>
+    {% empty %}
+        <p>Aucun commentaire pour ce jeu.</p>
+    {% endfor %}
+</body>
+</html>

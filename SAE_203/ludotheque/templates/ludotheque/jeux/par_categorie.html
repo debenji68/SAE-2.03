@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'ludotheque/style.css' %}">
+    <meta charset="UTF-8">
+    <title>Jeux de la catégorie {{ categorie.nom }}</title>
+</head>
+<body>
+    <h1>Catégorie : {{ categorie.nom }}</h1>
+    <a href="{% url 'accueil' %}">Accueil</a>
+    <hr>
+
+    {% if categorie.descriptif %}
+        <p>{{ categorie.descriptif }}</p>
+        <hr>
+    {% endif %}
+
+    {% for jeu in jeux %}
+        <h2>{{ jeu.titre }}</h2>
+        <p>Année de sortie : {{ jeu.annee_sortie }}</p>
+        <p>Éditeur : {{ jeu.editeur }}</p>
+        <p>Auteur : {{ jeu.auteur }}</p>
+        {% if jeu.photo_boite %}
+            <img src="{{ jeu.photo_boite.url }}" width="150">
+        {% endif %}
+        <br>
+        <a href="{% url 'fiche_jeu' jeu.id %}">Voir la fiche</a>
+        <hr>
+    {% empty %}
+        <p>Aucun jeu enregistré dans cette catégorie.</p>
+    {% endfor %}
+</body>
+</html>

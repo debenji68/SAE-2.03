@@ -41,7 +41,7 @@
                 </div>
                 <div class="card-footer-action">
                     {% if jeu_choisi.id %}
-                        <a href="{% url 'modifier_jeu' jeu_choisi.id %}" class="btn-card-link">Voir la fiche →</a>
+                        <a href="{% url 'fiche_jeu' jeu_choisi.id %}" class="btn-card-link">Voir la fiche →</a>
                     {% else %}
                         <a href="{% url 'liste_jeux' %}" class="btn-card-link">Voir la fiche →</a>
                     {% endif %}
@@ -51,12 +51,12 @@
             <article class="discovery-card card-author">
                 <span class="card-type-badge">Auteur Vedette</span>
                 <div class="discovery-content">
-                    <h3>{{ auteur_choisi.nom|default:"Aucun auteur disponible" }}</h3>
-                    <p class="card-desc">Biographie en cours de rédaction.</p>
+                    <h3>{{ auteur_choisi|default:"Aucun auteur disponible" }}</h3>
+                    <p class="card-desc">{{ auteur_choisi.biographie|default:"Biographie en cours de rédaction." }}</p>
                 </div>
                 <div class="card-footer-action">
                     {% if auteur_choisi.id %}
-                        <a href="{% url 'modifier_auteur' auteur_choisi.id %}" class="btn-card-link">Découvrir ses jeux →</a>
+                        <a href="{% url 'jeux_par_auteur' auteur_choisi.id %}" class="btn-card-link">Découvrir ses jeux →</a>
                     {% else %}
                         <a href="{% url 'liste_auteurs' %}" class="btn-card-link">Découvrir ses jeux →</a>
                     {% endif %}
@@ -67,11 +67,11 @@
                 <span class="card-type-badge">Focus Catégorie</span>
                 <div class="discovery-content">
                     <h3>{{ categorie_choisie.nom|default:"Aucune catégorie" }}</h3>
-                    <p class="card-desc">{{ categorie_choisie.description|default:"Explorez cette thématique." }}</p>
+                    <p class="card-desc">{{ categorie_choisie.descriptif|default:"Explorez cette thématique." }}</p>
                 </div>
                 <div class="card-footer-action">
                     {% if categorie_choisie.id %}
-                        <a href="{% url 'modifier_categorie' categorie_choisie.id %}" class="btn-card-link">Parcourir →</a>
+                        <a href="{% url 'jeux_par_categorie' categorie_choisie.id %}" class="btn-card-link">Parcourir →</a>
                     {% else %}
                         <a href="{% url 'liste_categories' %}" class="btn-card-link">Parcourir →</a>
                     {% endif %}
@@ -83,11 +83,11 @@
                 <div class="discovery-content">
                     <h3>{{ commentaire_choisi.jeu.titre|default:"Avis sur un jeu" }}</h3>
                     <p class="meta-info">Note : {{ commentaire_choisi.note|default:"--" }}/20</p>
-                    <p class="card-desc">« {{ commentaire_choisi.texte|default:"Aucun commentaire enregistré pour le moment." }} »</p>
+                    <p class="card-desc">« {{ commentaire_choisi.commentaire|default:"Aucun commentaire enregistré pour le moment." }} »</p>
                 </div>
                 <div class="card-footer-action">
                     {% if commentaire_choisi.id %}
-                        <a href="{% url 'modifier_commentaire' commentaire_choisi.id %}" class="btn-card-link">Lire tous les avis →</a>
+                        <a href="{% url 'commentaires_joueur' commentaire_choisi.joueur.id %}" class="btn-card-link">Lire tous les avis →</a>
                     {% else %}
                         <a href="{% url 'liste_commentaires' %}" class="btn-card-link">Lire tous les avis →</a>
                     {% endif %}

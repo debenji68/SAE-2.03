@@ -4,6 +4,12 @@ from . import views
 urlpatterns = [
     path('', views.accueil, name='accueil'),
 
+    # Pages de détail depuis la sélection aléatoire (reroll)
+    path('auteurs/<int:id>/jeux/', views.jeux_par_auteur, name='jeux_par_auteur'),
+    path('categories/<int:id>/jeux/', views.jeux_par_categorie, name='jeux_par_categorie'),
+    path('jeux/<int:id>/fiche/', views.fiche_jeu, name='fiche_jeu'),
+    path('joueurs/<int:id>/commentaires/', views.commentaires_joueur, name='commentaires_joueur'),
+
     # Catégories
     path('categories/', views.liste_categories, name='liste_categories'),
     path('categories/ajouter/', views.ajouter_categorie, name='ajouter_categorie'),
