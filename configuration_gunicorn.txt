@@ -1,0 +1,18 @@
+Unit]
+Description=gunicorn daemon for Django SAE
+After=network.target
+
+[Service]
+User=toto
+Group=www-data
+WorkingDirectory=/home/toto/SAE-2.03/SAE_203
+# systemd va créer automatiquement le dossier /run/gunicorn/ avec les droits po>
+RuntimeDirectory=gunicorn
+ExecStart=/home/toto/SAE-2.03/.venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn/gunicorn.sock \
+          SAE_203.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

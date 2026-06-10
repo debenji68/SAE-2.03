@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_name 10.128.233.161; # <-- IP de ta VM Web
+
+    # Gestion des fichiers statiques (CSS, JS, images de boîtes de jeux)
+    location /static/ {
+        alias /home/toto/SAE-2.03/SAE_203/static/;
+    }
+
+    # Redirection de tout le reste vers Gunicorn
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn/gunicorn.sock;
+    }
+}
