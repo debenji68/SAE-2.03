@@ -6,9 +6,9 @@ Interface de gestion d'une ludothèque
 Ce projet a été réalisé dans le cadre de la compétence **RT3 (Programmer)**. L'objectif est de concevoir et déployer une solution web complète (Django/Python) hébergée sur une VM Linux pour la gestion conviviale d'une ludothèque.
 
 ## 👥 L'Équipe (Groupe 4)
-*   **Étudiant A** : Gestion des Utilisateurs (Joueurs), Commentaires et Listes personnelles.
-*   **Étudiant B** : Gestion du Catalogue (Jeux, Auteurs, Catégories) et Modélisation.
-*   **Étudiant C** : Architecture BDD, Design (HTML/CSS) et Intégration.
+*   **Étudiant A** : Création et mises en place des CRUDS joueurs, commentaires et liste personel. Création et configuration de la VM web et de la VM BDD.
+*   **Étudiant B** : Création et mises en places des CRUDS jeux, catégories et auteurs.
+*   **Étudiant C** : Création de la Base de Donnée MySQL et conception du site web (Html/CSS).
 *   **Étudiant D** : Algorithmique (Stats, Moyennes), Import CSV et Génération de fiches.
 
 ---
@@ -23,28 +23,3 @@ Le site permet de gérer l'ensemble des données d'une ludothèque avec les fonc
     - Mise en avant des commentaires "Top" (meilleure note) et "Flop" (pire note).
 - **Importation de données** : Ajout massif de jeux via un fichier CSV/JSON (création automatique des auteurs si inexistants).
 - **Reporting** : Génération d'une fiche récapitulative par joueur.
-
----
-## 📅 Roadmap & Planning (Gantt)
-
-```mermaid
-gantt
-    title Roadmap SAÉ Ludothèque
-    dateFormat  YYYY-MM-DD
-    axisFormat  %d/%m
-    
-    section Infrastructure
-    Configuration VM & Django (Tous)      :done, 2026-05-12, 3d
-    Architecture BDD & Template Base (C) :active, 2026-05-15, 4d
-    
-    section Développement CRUD
-    Catalogue : Jeux, Auteurs (B)        :2026-05-19, 6d
-    Utilisateurs & Commentaires (A)      :2026-05-19, 6d
-    
-    section Logique Métier
-    Import CSV & Stats Moyennes (D)      :2026-05-25, 5d
-    Génération Fiche Joueur (D)          :2026-05-27, 3d
-    
-    section Finalisation
-    Intégration Design & Tests (C+A)     :2026-05-30, 4d
-    Rapport & Soutenance (Tous)          :2026-06-03, 4d
